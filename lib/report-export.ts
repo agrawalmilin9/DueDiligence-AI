@@ -1,0 +1,65 @@
+import { recommendationLabel } from './labels'
+import type { InvestigationReport } from './types'
+
+export function reportToMarkdown(report: InvestigationReport) {
+  const { company, metrics, recommendation, memo } = report
+  const lines = [
+    `# Due Diligence Report: ${company.name}`,
+    '',
+    `_Request: ${report.request}_`,
+    `_Generated: ${new Date(report.generatedAt).toUTCString()}_`,
+    '',
+    `## Final Recommendation: ${recommendationLabel[recommendation.verdict]}`,
+    `Score: ${recommendation.score}/100 · Confidence: ${recommendation.confidence}%`,
+    '',
+    recommendation.summary,
+    '',
+    '**Conditions before investing**',
+    ...recommendation.conditions.map((c) => `- ${c}`),
+    '',
+    '## Company Overview',
+    company.tagline,
+    '',
+    company.description,
+    '',
+    `- Sector: ${company.sector}`,
+    `- Stage: ${company.stage}`,
+    `- Founded: ${company.founded}`,
+    `- Headquarters: ${company.headquarters}`,
+    `- Website: ${company.website}`,
+    '',
+    '## Funding & Team',
+    `- Total funding: ${metrics.totalFunding}`,
+    `- Last round: ${metrics.lastRound} (${metrics.lastRoundDate})`,
+    `- Valuation: ${metrics.valuation}`,
+    `- Employees: ${metrics.employees} (${metrics.employeeGrowth})`,
+    `- Investors: ${metrics.investors.join(', ')}`,
+    '',
+    '## Founders',
+    ...report.founders.map((f) => `- **${f.name}**, ${f.role}: ${f.background} (${f.profileUrl})`),
+    '',
+    '## Competitors',
+    ...report.competitors.map(
+      (c) => `- **${c.name}** (${c.positioning}, ${c.funding}, threat: ${c.threat}): ${c.description}`,
+    ),
+    '',
+    '## Key Findings',
+    ...report.findings.map((f) => `- [${f.sentiment}] **${f.title}**: ${f.detail}`),
+    '',
+    '## Risk Analysis',
+    ...report.risks.map(
+      (r) => `- [${r.level.toUpperCase()}] ${r.category} — **${r.title}**: ${r.description} Mitigation: ${r.mitigation}`,
+    ),
+    '',
+    '## Claim Verification',
+    ...report.claims.map(
+      (c) => `- [${c.status}] "${c.claim}"\n  - ${c.evidence}\n  - Source: [${c.source.title}](${c.source.url})`,
+    ),
+    '',
+    '## Investment Memo',
+    `**Thesis:** ${memo.thesis}`,
+    '',
+    ...memo.sections.flatMap((s) => [`### ${s.heading}`, s.body, '']),
+  ]
+  return lines.join('\n')
+}

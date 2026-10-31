@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"Crustdata": {
+			"type": "http",
+			"url": "https://install.crustdata.com/mcp"
+		}
+	}
+}
